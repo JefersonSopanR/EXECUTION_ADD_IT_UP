@@ -2,24 +2,20 @@
 
 extern t_global	g_global;
 
-void	ft_execute_pipe(t_node *node)
-{
-	
-}
-
 void	ft_start_execution(t_node *ast)
 {
 	if (!ast)
 		return ;
-	else if (ast->type == NODE_PIPE)
-		ft_execute_pipe(ast);
 	else if (ast->type == NODE_AND)
 	{
 		ft_start_execution(ast->left);
 		ft_start_execution(ast->right);
 	}
 	else
+	{
 		ft_execute_command(ast);
+	}
+	return ;
 }
 
 void	ft_child_process(t_node *node, char **envp)
@@ -76,9 +72,14 @@ int	ft_execute_normal_cmd(t_node *node)
 
 void	ft_execute_command(t_node *node)
 {
-	if (!node->data)
+	if (node->data[0] == '\0')
+	{
+		printf("%d\n", g_global.stdin);
+		ft_check_redirections(node->redir);
+		ft_reset_fd();
 		return ;
-	if (ft_execute_normal_cmd(node))
+	}
+	else if (ft_execute_normal_cmd(node))
 	{
 		ft_free_ast(g_global.ast);
 		ft_free_tokens(&g_global.token);
@@ -87,4 +88,16 @@ void	ft_execute_command(t_node *node)
 	return ;
 }
 
+void	ft_reset_fd(void)
+{
+	int	fd_in;
+	int	fd_out;
+
+	fd_in = g_global.stdin;
+	fd_out = g_global.stdout;
+	dup2(fd_in, 0);
+    dup2(fd_out, 1);
+    close(fd_in);
+    close(fd_out);
+}
 

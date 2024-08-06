@@ -50,10 +50,7 @@ void	execute_command(char *command, char **envp)
 
 	if (command == NULL || command[0] == '\0')
 		return ;
-	if (ft_strchr(command, '\''))
-		split_command = ft_handle_quotes(command);
-	else
-		split_command = ft_split(command, ' ');
+	split_command = ft_split(command, ' ');
     path = get_path(split_command[0], envp);
     if (path == NULL)
     {

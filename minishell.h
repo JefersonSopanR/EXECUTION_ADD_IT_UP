@@ -22,6 +22,7 @@
 # include <errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include <termios.h>
 
 typedef enum e_type
 {
@@ -90,15 +91,66 @@ typedef struct s_global
 	t_envp		*envp;
 	bool		quote;
 	char		**dup_envp;
+	int			stdin;
+	int			stdout;
+	//struct termios	original_term;
 }	t_global;
+
+//init
+
+void	ft_init_minishell(void);
+void	ft_reset_fd(void);
+
+//TOKENIZATION
+
+void	ft_free_tokens(t_token **token);
+t_token	*ft_get_tokens(char *line);
+t_token		*ft_new_token(t_token_type type, char *data);
+void		ft_add_back(t_token **token, t_token *new);
+void		ft_free_tokens(t_token **token);
+bool		ft_check_quotes(char *line);
+void		ft_print_tokens(void);
+void		ft_id_redir_input(t_token **token, char *line, int *i);
+void		ft_id_redir_output(t_token **token, char *line, int *i);
+void		ft_identify_redir(t_token **token, char *line, int *i);
+void		ft_identify_parenthesis(t_token **token, char *line, int *i);
+void		ft_identify_and_or(t_token **token, char *line, int *i);
+void		ft_identify_operators(t_token **token, char *line, int *i);
+int			ft_keep_in_quotes(char *line, int *i, char *quote, bool flag);
+char		*ft_append_quoted_word(char *line, int *i, char quote, char *data);
+char		*ft_join_normal_data(char *line, int *i, char *data, char *quote);
+
+
+//PARSING
+
+t_node		*ft_new_node(t_node_type type);
+t_redir		*ft_new_redir(void);
+void		ft_add_redir_back(t_redir **redir, t_redir *new);
+char		*ft_get_node_data(void);
+bool		ft_is_not_op(char *line, int *i);
+bool		ft_is_cmd(t_token *token);
+bool		ft_is_redir(t_token_type type);
+t_redir		*ft_fill_redir(t_redir **redir);
+t_node		*ft_get_cmd_node(void);
+t_node		*ft_primary(void);
+t_node		*ft_expression(int min_prec);
+t_node		*ft_create_ast(t_token *token);
+void		ft_free_redir(t_redir *redir);
+void		ft_free_cmd(t_node *ast);
+void		ft_free_ast(t_node *ast);
+t_node		*ft_connect_nodes(t_token_type op, t_node *left, t_node *right);
+t_node_type	ft_convert_type(t_token_type op);
+int			ft_prec(t_token_type type);
+t_node		*ft_new_node(t_node_type type);
+bool		ft_is_cmd(t_token *token);
+
+
+//EXECUTION
 
 void	free_split(char **split);
 char	*create_path(char *path, char *cmd);
 char	*get_path(char *cmd, char **envp);
 void	execute_command(char *command, char **envp);
-char	**ft_handle_quotes(char	*command);
-char	**ft_handle_dquotes(char *command, int quotes, int i, int j);
-char	**ft_handle_quotes(char	*command);
 int	get_here_doc(char *delimeter);
 void	child_get_input(char *delimeter, int pfd[]);
 int	ft_redir_append(char	*file);
@@ -109,41 +161,15 @@ int	ft_execute_normal_cmd(t_node *node);
 int	ft_check_redirections(t_redir	*redirect);
 void	ft_child_process(t_node *node, char **envp);
 void	ft_start_execution(t_node *ast);
-char		*ft_join_normal_data(char *line, int *i, char *data, char *quote);
-int			ft_keep_in_quotes(char *line, int *i, char *quote, bool flag);
-char		*ft_append_quoted_word(char *line, int *i, char quote, char *data);
-t_node		*ft_connect_nodes(t_token_type op, t_node *left, t_node *right);
-t_node_type	ft_convert_type(t_token_type op);
-int			ft_prec(t_token_type type);
-t_node		*ft_new_node(t_node_type type);
-bool		ft_is_cmd(t_token *token);
+void	ft_reset_fd(void);
+
+
+//PRINTERS
 void		ft_print_ast(t_node *ast, int depth);
 void		ft_print_error(t_token *token);
-void		ft_free_redir(t_redir *redir);
-void		ft_free_cmd(t_node *ast);
-void		ft_free_ast(t_node *ast);
-void		ft_print_tokens(void);
-void		ft_id_redir_input(t_token **token, char *line, int *i);
-void		ft_id_redir_output(t_token **token, char *line, int *i);
-void		ft_identify_redir(t_token **token, char *line, int *i);
-void		ft_identify_parenthesis(t_token **token, char *line, int *i);
-void		ft_identify_and_or(t_token **token, char *line, int *i);
-void		ft_identify_operators(t_token **token, char *line, int *i);
-t_redir		*ft_fill_redir(t_redir **redir);
-t_node		*ft_get_cmd_node(void);
-t_node		*ft_primary(void);
-t_node		*ft_expression(int min_prec);
-t_node		*ft_create_ast(t_token *token);
-void		ft_free_tokens(t_token **token);
-bool		ft_check_quotes(char *line);
-bool		ft_is_not_op(char *line, int *i);
-bool		ft_is_cmd(t_token *token);
-bool		ft_is_redir(t_token_type type);
-t_token		*ft_new_token(t_token_type type, char *data);
-void		ft_add_back(t_token **token, t_token *new);
-t_node		*ft_new_node(t_node_type type);
-t_redir		*ft_new_redir(void);
-void		ft_add_redir_back(t_redir **redir, t_redir *new);
+
+
+//ENVP
 t_envp		*ft_duplicate_envp(char **env);
 void		ft_add_back_envp(t_envp **envp, t_envp *new);
 t_envp		*ft_new_envp(char *key, char *value);
@@ -151,6 +177,5 @@ void		ft_free_envp(t_envp **envp);
 void		ft_print_envp(t_envp *envp);
 char		*ft_get_value(char *env);
 char		*ft_get_key(char *env);
-char		*ft_get_node_data(void);
 
 #endif

@@ -4,15 +4,15 @@ int	ft_redir_in(char	*file)
 {
 	int	infile_fd;
 
-	infile_fd = open(file, O_RDONLY);
+	ft_putstr_fd(file, 1);
+	infile_fd = open(file, O_RDONLY, 0444);
 	if (infile_fd == -1)
 	{
-		perror("no such file or directory: ");
+		ft_putstr_fd("no such file or directory: ", 2);
 		ft_putstr_fd(file, 2);
 		ft_putstr_fd("\n", 2);
 		return (1);
 	}
-	printf("(in)\n");
 	dup2(infile_fd, 0);
 	close(infile_fd);
 	return (0);
@@ -28,7 +28,6 @@ int	ft_redir_out(char	*file)
 		perror("Error creating outfile\n");
 		return (1);
 	}
-	printf("(out)\n");
 	dup2(outfile_fd, 1);
 	close(outfile_fd);
 	return (0);

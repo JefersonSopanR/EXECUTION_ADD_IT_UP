@@ -1,17 +1,33 @@
 #include "minishell.h"
 
-t_global	g_global = {NULL, E_NONE, NULL, NULL, NULL, true, NULL};
+t_global	g_global;
+
+void	ft_init_minishell(void)
+{
+	g_global.cur_token = NULL;
+	g_global.error_type = E_NONE;
+	g_global.token = NULL;
+	g_global.ast = NULL;
+	g_global.envp = NULL;
+	g_global.quote = true;
+	g_global.dup_envp = NULL;
+	g_global.stdin = dup(0);
+	g_global.stdout = dup(1);
+	//tcgetattr(STDIN_FILENO, &g_global.original_term);
+}
 
 int	main(int ac, char **av, char **env)
 {
-	char	*line;
+	char	*line = NULL;
 
 	(void)ac;
 	(void)av;
 	g_global.envp = ft_duplicate_envp(env);
 	while (1)
 	{
-		line = readline("==> ");
+		line = readline("My_minishell-> ");
+		if (!line)
+			continue ;
 		if (!ft_strlen(line))
 		{
 			free(line);
@@ -34,6 +50,7 @@ int	main(int ac, char **av, char **env)
 		if (g_global.ast && !g_global.error_type)
 		{
 			ft_print_ast(g_global.ast, 0);
+			//tcsetattr(STDIN_FILENO, TCSANOW, &g_global.original_term);
 			ft_start_execution(g_global.ast);
 			ft_free_tokens(&g_global.token);
 			ft_free_ast(g_global.ast);

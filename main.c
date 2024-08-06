@@ -13,7 +13,6 @@ void	ft_init_minishell(void)
 	g_global.dup_envp = NULL;
 	g_global.stdin = dup(0);
 	g_global.stdout = dup(1);
-	//tcgetattr(STDIN_FILENO, &g_global.original_term);
 }
 
 int	main(int ac, char **av, char **env)
@@ -50,7 +49,6 @@ int	main(int ac, char **av, char **env)
 		if (g_global.ast && !g_global.error_type)
 		{
 			ft_print_ast(g_global.ast, 0);
-			//tcsetattr(STDIN_FILENO, TCSANOW, &g_global.original_term);
 			ft_start_execution(g_global.ast);
 			ft_free_tokens(&g_global.token);
 			ft_free_ast(g_global.ast);

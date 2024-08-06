@@ -93,7 +93,6 @@ typedef struct s_global
 	char		**dup_envp;
 	int			stdin;
 	int			stdout;
-	//struct termios	original_term;
 }	t_global;
 
 //init

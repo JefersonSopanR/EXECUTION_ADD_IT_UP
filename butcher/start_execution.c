@@ -74,8 +74,9 @@ void	ft_execute_command(t_node *node)
 {
 	if (node->data[0] == '\0')
 	{
-		printf("%d\n", g_global.stdin);
 		ft_check_redirections(node->redir);
+		printf("stdin->%d\n", g_global.stdin);
+		printf("stdout->%d\n", g_global.stdout);
 		ft_reset_fd();
 		return ;
 	}

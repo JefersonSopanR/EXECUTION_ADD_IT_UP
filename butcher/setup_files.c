@@ -22,13 +22,13 @@ int	ft_redir_out(char	*file)
 {
 	int	outfile_fd;
 
-	outfile_fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	outfile_fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (outfile_fd == -1)
 	{
 		perror("Error creating outfile\n");
 		return (1);
 	}
-	dup2(outfile_fd, 1);
+	dup2(outfile_fd, STDOUT_FILENO);
 	close(outfile_fd);
 	return (0);
 }

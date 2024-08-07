@@ -11,8 +11,12 @@ void	ft_init_minishell(void)
 	g_global.envp = NULL;
 	g_global.quote = true;
 	g_global.dup_envp = NULL;
+}
+
+void	ft_get_minishell_ready(void)
+{
 	g_global.stdin = dup(0);
-	g_global.stdout = dup(1);
+	g_global.stdout = dup(STDOUT_FILENO);
 }
 
 int	main(int ac, char **av, char **env)
@@ -21,9 +25,11 @@ int	main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
+	ft_init_minishell();
 	g_global.envp = ft_duplicate_envp(env);
 	while (1)
 	{
+		ft_get_minishell_ready();
 		line = readline("My_minishell-> ");
 		if (!line)
 			continue ;

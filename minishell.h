@@ -119,6 +119,8 @@ int			ft_keep_in_quotes(char *line, int *i, char *quote, bool flag);
 char		*ft_append_quoted_word(char *line, int *i, char quote, char *data);
 char		*ft_join_normal_data(char *line, int *i, char *data, char *quote);
 
+void	ft_prep_quote_word(t_token **token, char *line, int *i, char *data);
+
 
 //PARSING
 

@@ -115,21 +115,25 @@ void	ft_ignore_quotes(t_token **token, char	*data, int j)
 	ft_add_back(token, ft_new_token(T_WORD, data_1));
 }
 
+void	ft_prep_quote_word(t_token **token, char *line, int *i, char *data)
+{
+	char	quote;
+
+	quote = line[*i];
+	(*i)++;
+	data = ft_append_quoted_word(line, i, quote, data);
+	ft_add_back(token, ft_new_token(T_WORD, data));
+}
+
 void	ft_append_word(t_token **token, char *line, int *i)
 {
 	int		start;
 	char	*data;
-	int		j;
-	char	quote;
 
-	j = 0;
 	if (line[*i] == '\'' || line[*i] == '"')
 	{
 		data = ft_strdup("");
-		quote = line[*i];
-		(*i)++;
-		data = ft_append_quoted_word(line, i, quote, data);
-		ft_add_back(token, ft_new_token(T_WORD, data));
+		ft_prep_quote_word(token, line, i, data);
 		return ;
 	}
 	start = (*i);
@@ -137,13 +141,14 @@ void	ft_append_word(t_token **token, char *line, int *i)
 	{
 		(*i)++;
 		if (line[*i] == '\'' || line[*i] == '"')
-			j++;
+		{
+			data = ft_substr(line, start, (*i) - start);
+			ft_prep_quote_word(token, line, i, data);
+			return ;
+		}
 	}
 	data = ft_substr(line, start, (*i) - start);
-	if (j > 0)
-		ft_ignore_quotes(token, data, j);
-	else
-		ft_add_back(token, ft_new_token(T_WORD, data));
+	ft_add_back(token, ft_new_token(T_WORD, data));
 }
 
 t_token	*ft_procces_line(char *line)

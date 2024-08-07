@@ -11,6 +11,7 @@ void	ft_init_minishell(void)
 	g_global.envp = NULL;
 	g_global.quote = true;
 	g_global.dup_envp = NULL;
+	g_global.line = NULL;
 }
 
 void	ft_get_minishell_ready(void)
@@ -19,35 +20,40 @@ void	ft_get_minishell_ready(void)
 	g_global.stdout = dup(STDOUT_FILENO);
 }
 
+int	ft_readline(void)
+{
+	ft_get_minishell_ready();
+	g_global.line = readline("My_minishell-> ");
+	if (!g_global.line)
+		return (1);
+	if (!ft_strlen(g_global.line))
+	{
+		free(g_global.line);
+		return (1);
+	}
+	if (g_global.line[0])
+		add_history(g_global.line);
+	return (0);
+}
+
 int	main(int ac, char **av, char **env)
 {
-	char	*line = NULL;
-
 	(void)ac;
 	(void)av;
 	ft_init_minishell();
 	g_global.envp = ft_duplicate_envp(env);
 	while (1)
 	{
-		ft_get_minishell_ready();
-		line = readline("My_minishell-> ");
-		if (!line)
+		if (ft_readline())
 			continue ;
-		if (!ft_strlen(line))
+		if (!ft_strncmp(g_global.line, "exit", 4))
 		{
-			free(line);
-			continue ;
-		}
-		if (!ft_strncmp(line, "exit", 4))
-		{
-			free(line);
+			free(g_global.line);
 			break ;
 		}
-		if (line[0])
-			add_history(line);
-		if (!ft_strncmp(line, "env", 3))
+		if (!ft_strncmp(g_global.line, "env", 3))
 			ft_print_envp(g_global.envp);
-		g_global.token = ft_get_tokens(line);
+		g_global.token = ft_get_tokens(g_global.line);
 		if (!g_global.token)
 			continue ;
 		ft_print_tokens();

@@ -93,12 +93,14 @@ typedef struct s_global
 	char		**dup_envp;
 	int			stdin;
 	int			stdout;
+	char		*line;
 }	t_global;
 
 //init
 
 void	ft_init_minishell(void);
 void	ft_reset_fd(void);
+int	ft_readline(void);
 
 //TOKENIZATION
 
